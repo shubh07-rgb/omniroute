@@ -1,0 +1,18 @@
+# Generated data / local state — never commit real fleet data
+data/*
+!data/.gitkeep
+state/*
+!state/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Env files with secrets (if you ever switch off IAM-role auth)
+.env
+
+# OS / editor cruft
+.DS_Store
+*.swp

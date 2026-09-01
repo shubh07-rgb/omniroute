@@ -1,0 +1,16 @@
+[
+  {
+    "zone_name": "High_Risk_Pass_A",
+    "min_lat": 34.05,
+    "max_lat": 34.10,
+    "min_long": -118.25,
+    "max_long": -118.20
+  },
+  {
+    "zone_name": "School_Zone_North",
+    "min_lat": 12.90,
+    "max_lat": 12.95,
+    "min_long": 77.55,
+    "max_long": 77.60
+  }
+]

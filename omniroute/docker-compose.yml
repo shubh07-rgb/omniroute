@@ -1,0 +1,72 @@
+services:
+
+  # ==========================================================
+  # KAFKA
+  # ==========================================================
+
+  kafka:
+    image: apache/kafka:4.3.1
+    container_name: omniroute-kafka
+
+    ports:
+      - "9092:9092"
+
+    environment:
+      # KRaft
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+
+      # Listeners
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://10.142.0.2:9092
+
+      # Controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+      # Protocol
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+      # Single-node settings
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      # Development
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+  # ==========================================================
+  # TELEMETRY PRODUCER (real-time)
+  # ==========================================================
+
+  producer:
+    build:
+      context: .
+      dockerfile: producer/Dockerfile
+
+    container_name: omniroute-producer
+
+    depends_on:
+      - kafka
+
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: 10.142.0.2:9092
+      KAFKA_TOPIC: vehicle-telemetry
+
+  # ==========================================================
+  # PYSPARK STREAMING
+  # ==========================================================
+
+  spark:
+    build:
+      context: ./spark
+
+    container_name: omniroute-spark
+
+    depends_on:
+      - kafka
+
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: 10.142.0.2:9092
+      KAFKA_TOPIC: vehicle-telemetry
